@@ -1,31 +1,113 @@
 import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import { users, type User } from './data.ts';
+import DataTable, { type Columns } from './DataTable.tsx';
+import { dateColumn, stringColumn } from './utils.tsx';
 
-function App() {
-  const [count, setCount] = useState(0);
+const columns: Columns<User> = {
+  picture: {
+    label: '',
+    render: ({ picture }) => <img src={picture.src} alt={picture.alt} width={32} />,
+  },
+  name: {
+    label: 'Name',
+    render: ({ firstName, lastName }) => (
+      <>
+        <strong>{firstName}</strong> {lastName}
+      </>
+    ),
+    sort: (a, z) => a.firstName.localeCompare(z.firstName) || a.lastName.localeCompare(z.lastName),
+  },
+  email: {
+    label: 'Email',
+    ...stringColumn((user: User) => user.email),
+  },
+  registeredAt: {
+    label: 'Registered At',
+    ...dateColumn((user: User) => user.registeredAt),
+  },
+  tags: {
+    label: 'Tags',
+    render: ({ tags }) => (
+      <div style={{ display: 'flex', gap: '4px' }}>
+        {tags.map((tag) => (
+          <span key={tag} className="tag">
+            {tag}
+          </span>
+        ))}
+      </div>
+    ),
+  },
+};
+
+const Complex = () => {
+  const [selection, setSelection] = useState<Set<number>>(new Set());
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-    </>
+    <DataTable
+      data={users}
+      columns={columns}
+      renderHead={(columns, RenderColumn) => (
+        <thead>
+          <tr>
+            <td>
+              <input
+                type="checkbox"
+                ref={(input) => {
+                  if (!input) return;
+                  input.indeterminate = selection.size > 0 && selection.size < users.length;
+                  input.checked = selection.size === users.length;
+                }}
+                onChange={() => {
+                  if (selection.size === users.length) setSelection(new Set());
+                  else setSelection(new Set(users.map(({ id }) => id)));
+                }}
+              />
+            </td>
+            {Object.keys(columns).map((column) => (
+              <RenderColumn key={column} column={column} />
+            ))}
+            <td>Actions</td>
+          </tr>
+        </thead>
+      )}
+      renderRow={(item, columns, RenderCell) => (
+        <tr key={item.id}>
+          <td>
+            <input
+              type="checkbox"
+              checked={selection.has(item.id)}
+              onChange={() => {
+                setSelection((selection) => {
+                  const updated = new Set(selection);
+                  if (selection.has(item.id)) updated.delete(item.id);
+                  else updated.add(item.id);
+                  return updated;
+                });
+              }}
+            />
+          </td>
+          {Object.keys(columns).map((column) => (
+            <RenderCell key={column} column={column} />
+          ))}
+          <td>
+            <button onClick={() => alert(`Editing user ${item.id}`)} style={{ padding: '4px' }}>
+              Edit
+            </button>
+          </td>
+        </tr>
+      )}
+    />
+  );
+};
+
+export default function App() {
+  return (
+    <main style={{ padding: '1rem', maxWidth: '1200px', margin: '0 auto' }}>
+      <h1 style={{ textAlign: 'center' }}>Datatable Architecture POC</h1>
+      <h2>Simple use-case</h2>
+      <DataTable data={users} columns={columns} keyFn={({ id }) => id} />
+      <h2>Complex use-case</h2>
+      <Complex />
+    </main>
   );
 }
-
-export default App;
