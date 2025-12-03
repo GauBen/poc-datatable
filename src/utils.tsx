@@ -18,5 +18,4 @@ export const stringArrayColumn = <T,>(get: (object: T) => string[]) => ({
       ))}
     </div>
   ),
-  sort: (a: T, z: T) => get(a).join(', ').localeCompare(get(z).join(', ')),
 });
