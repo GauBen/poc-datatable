@@ -51,12 +51,10 @@ export default function DataTable<T>({
     </tr>
   );
 
-  const [sort, setSort] = useState<{ column: keyof Columns<T>; direction: 'asc' | 'desc' }>();
+  const [sort, setSort] = useState<{ column: keyof Columns<T>; direction: -1 | 1 }>();
 
   const sorted = sort
-    ? data.toSorted(
-        (a, z) => columns[sort.column].sort!(a, z) * (sort.direction === 'asc' ? 1 : -1)
-      )
+    ? data.toSorted((a, z) => columns[sort.column].sort!(a, z) * sort.direction)
     : data;
 
   return (
@@ -70,13 +68,13 @@ export default function DataTable<T>({
               onClick={() => {
                 setSort((currentSort) => {
                   if (currentSort?.column === column)
-                    if (currentSort.direction === 'asc') return { column, direction: 'desc' };
+                    if (currentSort.direction === 1) return { column, direction: -1 };
                     else return undefined;
-                  else return { column, direction: 'asc' };
+                  else return { column, direction: 1 };
                 });
               }}
             >
-              {sort?.column === column ? (sort.direction === 'asc' ? '🔼' : '🔽') : '⇅'}
+              {sort?.column === column ? (sort.direction === 1 ? '🔼' : '🔽') : '⇅'}
             </button>
           )}
         </th>
