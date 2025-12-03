@@ -7,3 +7,16 @@ export const stringColumn = <T,>(get: (object: T) => string) => ({
   render: (object: T) => get(object),
   sort: (a: T, z: T) => get(a).localeCompare(get(z)),
 });
+
+export const stringArrayColumn = <T,>(get: (object: T) => string[]) => ({
+  render: (object: T) => (
+    <div style={{ display: 'flex', gap: '4px' }}>
+      {get(object).map((tag) => (
+        <span key={tag} className="tag">
+          {tag}
+        </span>
+      ))}
+    </div>
+  ),
+  sort: (a: T, z: T) => get(a).join(', ').localeCompare(get(z).join(', ')),
+});

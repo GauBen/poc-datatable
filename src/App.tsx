@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { users, type User } from './data.ts';
 import DataTable, { type Columns } from './DataTable.tsx';
-import { dateColumn, stringColumn } from './utils.tsx';
+import { dateColumn, stringArrayColumn, stringColumn } from './utils.tsx';
 
 const columns: Columns<User> = {
   picture: {
@@ -27,15 +27,7 @@ const columns: Columns<User> = {
   },
   tags: {
     label: 'Tags',
-    render: ({ tags }) => (
-      <div style={{ display: 'flex', gap: '4px' }}>
-        {tags.map((tag) => (
-          <span key={tag} className="tag">
-            {tag}
-          </span>
-        ))}
-      </div>
-    ),
+    ...stringArrayColumn((user: User) => user.tags),
   },
 };
 
