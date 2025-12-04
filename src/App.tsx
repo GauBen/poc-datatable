@@ -35,9 +35,13 @@ export default function App() {
   return (
     <main style={{ padding: '1rem', maxWidth: '1200px', margin: '0 auto' }}>
       <h1 style={{ textAlign: 'center' }}>Datatable Architecture POC</h1>
-      <h2>Simple use-case</h2>
+      <h2>
+        <code>{'<DataTable />'}</code>
+      </h2>
       <DataTable data={users} columns={columns} keyFn={({ id }) => id} />
-      <h2>Complex use-case</h2>
+      <h2>
+        <code>{'<ActionableDataTable />'}</code>
+      </h2>
       <ActionableDataTable
         data={users}
         columns={columns}
@@ -51,6 +55,9 @@ export default function App() {
           console.log('Selection changed:', Array.from(selection));
         }}
       />
+      <p>
+        <a href="https://github.com/GauBen/poc-datatable/blob/main/src/App.tsx">View Source</a>
+      </p>
     </main>
   );
 }
